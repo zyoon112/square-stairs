@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>수달의 하늘 계단: 100층 O/X 등반</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Tone.js for Web Audio Effects -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Gamja+Flower&family=Noto+Sans+KR:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Noto Sans KR', 'sans-serif'],
+                        cute: ['Gamja Flower', 'cursive'],
+                    },
+                    colors: {
+                        skyTheme: {
+                            top: '#38bdf8',
+                            mid: '#bae6fd',
+                            cloud: '#f0f9ff',
+                            pinkAccent: '#f472b6',
+                            yellowAccent: '#fde047'
+                        }
+                    },
+                    animation: {
+                        'float-slow': 'float 4s ease-in-out infinite',
+                        'bounce-cute': 'bounceCute 0.4s ease-in-out',
+                        'stair-hop': 'stairHop 0.22s cubic-bezier(0.25, 1, 0.5, 1) forwards',
+                        'shake': 'shake 0.4s ease-in-out',
+                        'cloud-drift': 'cloudDrift 20s linear infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-8px)' },
+                        },
+                        bounceCute: {
+                            '0%, 100%': { transform: 'translateY(0) scale(1)' },
+                            '50%': { transform: 'translateY(-14px) scale(1.06)' },
+                        },
+                        stairHop: {
+                            '0%': { transform: 'translate(0, 0) scale(1) rotate(0deg)' },
+                            '45%': { transform: 'translate(18px, -46px) scale(1.18) rotate(6deg)' },
+                            '85%': { transform: 'translate(36px, -38px) scale(1.02) rotate(1deg)' },
+                            '100%': { transform: 'translate(36px, -38px) scale(1) rotate(0deg)' },
+                        },
+                        shake: {
+                            '0%, 100%': { transform: 'translateX(0)' },
+                            '20%, 60%': { transform: 'translateX(-8px)' },
+                            '40%, 80%': { transform: 'translateX(8px)' },
+                        },
+                        cloudDrift: {
+                            '0%': { transform: 'translateX(-10%)' },
+                            '100%': { transform: 'translateX(110%)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background: linear-gradient(180deg, #0284c7 0%, #38bdf8 40%, #7dd3fc 75%, #bae6fd 100%);
+            touch-action: manipulation;
+            user-select: none;
+            overflow-y: auto;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        .sky-card {
+            background: rgba(255, 255, 255, 0.93);
+            backdrop-filter: blur(12px);
+            border: 3px solid rgba(255, 255, 255, 0.95);
+            box-shadow: 0 10px 25px -5px rgba(14, 165, 233, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+        }
+
+        /* 3D Light Paving Block Stair */
+        .stair-block-light-3d {
+            border-radius: 8px;
+            box-shadow: 0 7px 0 #d97706, 0 10px 14px rgba(0,0,0,0.22);
+            transition: transform 0.15s ease-out;
+        }
+        .stair-block-light-3d::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: -7px;
+            height: 7px;
+            background: #d97706;
+            border-bottom-left-radius: 6px;
+            border-bottom-right-radius: 6px;
+        }
+
+        /* Active Dark Brown 3D Stair Block (현재 층 발판) */
+        .stair-block-dark-3d {
+            border-radius: 8px;
+            box-shadow: 0 7px 0 #2e1005, 0 10px 16px rgba(0,0,0,0.35);
+            transition: transform 0.15s ease-out;
+        }
+        .stair-block-dark-3d::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: -7px;
+            height: 7px;
+            background: #2e1005;
+            border-bottom-left-radius: 6px;
+            border-bottom-right-radius: 6px;
+        }
+
+        .ox-btn {
+            background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%);
+            border: 3px solid #7dd3fc;
+            box-shadow: 0 5px 0px #0284c7;
+            transition: all 0.1s ease-out;
+        }
+        .ox-btn:active:not(:disabled) {
+            transform: translateY(3px);
+            box-shadow: 0 2px 0px #0284c7;
+        }
+        .ox-btn-o { border-color: #38bdf8; color: #0284c7; }
+        .ox-btn-x { border-color: #f472b6; color: #e11d48; }
+
+        @media (max-height: 720px) {
+            .compact-hide { display: none !important; }
+            .compact-py { padding-top: 0.25rem !important; padding-bottom: 0.25rem !important; }
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(240, 249, 255, 0.6); }
+        ::-webkit-scrollbar-thumb { background: #38bdf8; border-radius: 3px; }
+    </style>
+</head>
+<body class="min-h-screen text-slate-800 flex flex-col items-center justify-between p-2 sm:p-4 relative">
+
+    <div class="fixed inset-0 pointer-events-none overflow-hidden z-0">
+        <div class="absolute top-10 left-[-10%] opacity-70 animate-cloud-drift text-white text-6xl">☁️</div>
+        <div class="absolute top-1/4 left-[-20%] opacity-50 animate-cloud-drift text-white text-8xl" style="animation-duration: 35s; animation-delay: -5s;">☁️</div>
+        <div class="absolute top-2/3 left-[-15%] opacity-60 animate-cloud-drift text-white text-7xl" style="animation-duration: 28s; animation-delay: -12s;">☁️</div>
+    </div>
+
+    <header class="w-full max-w-lg sky-card rounded-2xl sm:rounded-3xl p-2 sm:p-2.5 mb-1 flex items-center justify-between z-20 shadow-xl relative">
+        <div class="flex items-center space-x-2">
+            <button id="btn-home" onclick="resetToHome()" class="text-sky-600 hover:text-sky-800 transition p-1.5 sm:p-2 rounded-2xl hover:bg-sky-100/70" title="처음으로">
+                <i class="fa-solid fa-house text-lg sm:text-xl"></i>
+            </button>
+            <div>
+                <h1 class="text-base sm:text-lg font-black text-sky-900 flex items-center gap-1.5 font-cute text-xl sm:text-2xl">
+                    <span>🦦 수달의 하늘 계단</span>
+                </h1>
+            </div>
+        </div>
+
+        <!-- HUD Stats -->
+        <div class="flex items-center space-x-2 sm:space-x-3">
+            <!-- 3 Hearts -->
+            <div class="flex items-center space-x-0.5 sm:space-x-1" id="hearts-container">
+                <i class="fa-solid fa-heart text-pink-500 text-sm sm:text-lg animate-pulse"></i>
+                <i class="fa-solid fa-heart text-pink-500 text-sm sm:text-lg animate-pulse"></i>
+                <i class="fa-solid fa-heart text-pink-500 text-sm sm:text-lg animate-pulse"></i>
+            </div>
+
+            <!-- Floor Counter -->
+            <div class="text-right">
+                <span class="text-[10px] text-sky-600 font-bold block leading-none">현재 / 목표</span>
+                <span id="floor-counter" class="text-lg sm:text-2xl font-black text-amber-500 font-cute">0 / 100F</span>
+            </div>
+
+            <!-- Pause Button -->
+            <button onclick="togglePause()" class="bg-amber-500 hover:bg-amber-600 text-white p-1.5 sm:p-2 rounded-xl text-xs font-bold shadow-md transition" title="일시정지">
+                <i class="fa-solid fa-pause"></i>
+            </button>
+
+            <!-- Cheat Sheet Button -->
+            <button onclick="toggleCheatSheet()" class="bg-sky-500 hover:bg-sky-600 text-white p-1.5 sm:p-2 rounded-xl text-xs font-bold shadow-md transition" title="도형 도감">
+                <i class="fa-solid fa-book-open"></i>
+            </button>
+        </div>
+    </header>
+
+    <main class="w-full max-w-lg flex-1 flex flex-col items-center justify-start relative my-0.5 z-10 min-h-0">
+
+        <!-- SCREEN 1: START SCREEN -->
+        <div id="screen-start" class="w-full sky-card rounded-3xl p-4 sm:p-6 text-center shadow-2xl flex flex-col items-center space-y-3 sm:space-y-4 border-4 border-white my-auto">
+            
+            <div class="relative py-2">
+                <div class="w-24 h-28 sm:w-28 sm:h-32 flex items-center justify-center animate-float-slow">
+                    <svg viewBox="0 0 100 120" class="w-full h-full drop-shadow-lg">
+                        <path d="M 32 90 Q 12 105 8 95 Q 12 80 36 82" fill="#8B5A2B"/>
+                        <ellipse cx="50" cy="75" rx="26" ry="30" fill="#9C6634"/>
+                        <ellipse cx="50" cy="78" rx="17" ry="20" fill="#F5DEB3"/>
+                        <ellipse cx="36" cy="102" rx="10" ry="5" fill="#6F421B"/>
+                        <ellipse cx="64" cy="102" rx="10" ry="5" fill="#6F421B"/>
+                        <ellipse cx="32" cy="75" rx="6" ry="12" fill="#8B5A2B" transform="rotate(20 32 75)"/>
+                        <ellipse cx="68" cy="75" rx="6" ry="12" fill="#8B5A2B" transform="rotate(-20 68 75)"/>
+                        <ellipse cx="50" cy="42" rx="24" ry="20" fill="#9C6634"/>
+                        <circle cx="28" cy="26" r="7" fill="#6F421B"/>
+                        <circle cx="28" cy="26" r="4" fill="#D2B48C"/>
+                        <circle cx="72" cy="26" r="7" fill="#6F421B"/>
+                        <circle cx="72" cy="26" r="4" fill="#D2B48C"/>
+                        <ellipse cx="50" cy="48" rx="14" ry="10" fill="#F5DEB3"/>
+                        <ellipse cx="50" cy="43" rx="5" ry="3.5" fill="#3D2314"/>
+                        <path d="M 45 48 Q 50 52 55 48" stroke="#3D2314" stroke-width="2" fill="none" stroke-linecap="round"/>
+                        <circle cx="38" cy="38" r="3.5" fill="#222"/>
+                        <circle cx="36.5" cy="36.5" r="1.2" fill="#FFF"/>
+                        <circle cx="62" cy="38" r="3.5" fill="#222"/>
+                        <circle cx="60.5" cy="36.5" r="1.2" fill="#FFF"/>
+                        <circle cx="31" cy="45" r="4" fill="#FFB6C1" opacity="0.8"/>
+                        <circle cx="69" cy="45" r="4" fill="#FFB6C1" opacity="0.8"/>
+                        <polygon points="50,68 53,74 59,75 55,79 56,85 50,82 44,85 45,79 41,75 47,74" fill="#FFD700" stroke="#DAA520" stroke-width="1"/>
+                    </svg>
+                </div>
+                <span class="absolute -bottom-1 right-0 bg-amber-400 text-slate-900 text-[10px] sm:text-xs font-black px-2.5 py-0.5 rounded-full shadow border-2 border-white">중2 수학</span>
+            </div>
+
+            <div class="space-y-1">
+                <h2 class="text-2xl sm:text-4xl font-black text-sky-900 font-cute">수달의 하늘 계단 O/X</h2>
+                <p class="text-slate-600 text-xs sm:text-sm leading-relaxed max-w-xs mx-auto font-semibold">
+                    여러 가지 사각형 성질 문항이 <span class="text-sky-600 font-bold">참(O)</span>인지 <span class="text-pink-500 font-bold">거짓(X)</span>인지 판단하세요!<br>
+                    하트 3개를 모두 잃으면 <span class="text-red-500 font-bold">0층으로 추락</span>하니 신중하게 100층까지 올라가세요! ☁️✨
+                </p>
+            </div>
+
+            <!-- Quadrilateral Tags -->
+            <div class="flex flex-wrap justify-center gap-1 max-w-xs text-[11px] sm:text-xs font-bold compact-hide">
+                <span class="px-2 py-0.5 rounded-full bg-sky-100 text-sky-700 border border-sky-300">평행사변형</span>
+                <span class="px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 border border-blue-300">직사각형</span>
+                <span class="px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 border border-purple-300">마름모</span>
+                <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 border border-emerald-300">정사각형</span>
+            </div>
+
+            <button onclick="startGame()" class="w-full py-3 sm:py-4 bg-gradient-to-r from-sky-400 via-sky-500 to-indigo-500 hover:brightness-105 text-white font-black text-base sm:text-xl rounded-2xl shadow-lg transition transform active:scale-95 font-cute flex items-center justify-center gap-2 border-2 border-white">
+                <i class="fa-solid fa-play"></i>
+                <span>등반 시작하기 (100F 도전!)</span>
+            </button>
+        </div>
+
+        <!-- SCREEN 2: IN-GAME SCREEN -->
+        <div id="screen-game" class="w-full sky-card rounded-3xl p-3 sm:p-4 text-center shadow-2xl flex flex-col justify-between border-4 border-white hidden space-y-2">
+            
+            <!-- Question Card -->
+            <div class="bg-white/95 rounded-2xl p-2.5 sm:p-3 border-2 border-sky-200 shadow-inner flex flex-col justify-center min-h-[75px] sm:min-h-[85px]">
+                <div class="flex items-center justify-end mb-1">
+                    <span id="combo-badge" class="text-[10px] sm:text-xs font-bold text-amber-600 bg-amber-100 px-2 py-0.5 rounded-full">🔥 0 콤보</span>
+                </div>
+                <h3 id="question-text" class="text-sm sm:text-base font-bold text-slate-800 leading-snug my-auto">
+                    문제가 이곳에 표시됩니다.
+                </h3>
+            </div>
+
+            <!-- Timer Bar (10 Seconds) -->
+            <div class="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden border border-white">
+                <div id="timer-bar" class="bg-gradient-to-r from-amber-400 to-pink-500 h-full w-full transition-all duration-100 ease-linear"></div>
+            </div>
+
+            <!-- Stairs Canvas View -->
+            <div id="stairs-container" class="relative w-full h-60 sm:h-72 rounded-2xl overflow-hidden border-2 border-white shadow-inner" style="background: linear-gradient(180deg, #0284c7 0%, #38bdf8 55%, #bae6fd 100%);">
+                <div class="absolute top-2 left-4 text-white text-xl opacity-60 pointer-events-none">☁️</div>
+                <div class="absolute top-6 right-8 text-white text-2xl opacity-50 pointer-events-none">☁️</div>
+                <div class="absolute top-1/2 left-1/3 text-white text-3xl opacity-30 pointer-events-none">☁️</div>
+
+                <!-- Diagonal Stairs Wrapper -->
+                <div id="stairs-wrapper" class="relative w-full h-full"></div>
+
+                <!-- Otter Character Avatar -->
+                <div id="player-avatar" class="absolute z-30 flex flex-col items-center pointer-events-none transition-none">
+                    <div id="jump-dust" class="absolute -bottom-1 text-xs opacity-0 transition-opacity duration-150">✨💨</div>
+                    <div class="w-12 h-14 sm:w-14 sm:h-16 flex items-center justify-center filter drop-shadow-md">
+                        <svg viewBox="0 0 100 120" class="w-full h-full">
+                            <path d="M 32 90 Q 12 105 8 95 Q 12 80 36 82" fill="#8B5A2B"/>
+                            <ellipse cx="50" cy="75" rx="26" ry="30" fill="#9C6634"/>
+                            <ellipse cx="50" cy="78" rx="17" ry="20" fill="#F5DEB3"/>
+                            <ellipse cx="36" cy="102" rx="10" ry="5" fill="#6F421B"/>
+                            <ellipse cx="64" cy="102" rx="10" ry="5" fill="#6F421B"/>
+                            <ellipse cx="32" cy="75" rx="6" ry="12" fill="#8B5A2B" transform="rotate(20 32 75)"/>
+                            <ellipse cx="68" cy="75" rx="6" ry="12" fill="#8B5A2B" transform="rotate(-20 68 75)"/>
+                            <ellipse cx="50" cy="42" rx="24" ry="20" fill="#9C6634"/>
+                            <circle cx="28" cy="26" r="7" fill="#6F421B"/>
+                            <circle cx="28" cy="26" r="4" fill="#D2B48C"/>
+                            <circle cx="72" cy="26" r="7" fill="#6F421B"/>
+                            <circle cx="72" cy="26" r="4" fill="#D2B48C"/>
+                            <ellipse cx="50" cy="48" rx="14" ry="10" fill="#F5DEB3"/>
+                            <ellipse cx="50" cy="43" rx="5" ry="3.5" fill="#3D2314"/>
+                            <path d="M 45 48 Q 50 52 55 48" stroke="#3D2314" stroke-width="2" fill="none" stroke-linecap="round"/>
+                            <circle cx="38" cy="38" r="3.5" fill="#222"/>
+                            <circle cx="36.5" cy="36.5" r="1.2" fill="#FFF"/>
+                            <circle cx="62" cy="38" r="3.5" fill="#222"/>
+                            <circle cx="60.5" cy="36.5" r="1.2" fill="#FFF"/>
+                            <circle cx="31" cy="45" r="4" fill="#FFB6C1" opacity="0.8"/>
+                            <circle cx="69" cy="45" r="4" fill="#FFB6C1" opacity="0.8"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Choice Buttons (Left: O / Right: X) -->
+            <div class="grid grid-cols-2 gap-2 sm:gap-3">
+                <button id="btn-step-left" onclick="makeChoice('left')" class="ox-btn ox-btn-o rounded-2xl p-2 sm:p-3 flex flex-col items-center justify-center group relative overflow-hidden h-16 sm:h-20">
+                    <span class="text-[10px] font-bold text-sky-600 bg-sky-100 px-2 py-0.5 rounded-full mb-0.5">[←] 왼쪽 (O - 참)</span>
+                    <span id="label-option-left" class="text-2xl sm:text-3xl font-black font-cute">O</span>
+                </button>
+
+                <button id="btn-step-right" onclick="makeChoice('right')" class="ox-btn ox-btn-x rounded-2xl p-2 sm:p-3 flex flex-col items-center justify-center group relative overflow-hidden h-16 sm:h-20">
+                    <span class="text-[10px] font-bold text-pink-600 bg-pink-100 px-2 py-0.5 rounded-full mb-0.5">[→] 오른쪽 (X - 거짓)</span>
+                    <span id="label-option-right" class="text-2xl sm:text-3xl font-black font-cute">X</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- MODAL 1: EXPLANATION MODAL -->
+        <div id="modal-explanation" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+            <div class="sky-card w-full max-w-md rounded-3xl p-4 sm:p-5 border-4 border-pink-300 shadow-2xl flex flex-col space-y-3 animate-shake">
+                <div class="flex items-center justify-between border-b border-sky-100 pb-2">
+                    <div class="flex items-center space-x-2 text-pink-500">
+                        <i class="fa-solid fa-triangle-exclamation text-xl"></i>
+                        <h3 id="modal-explanation-title" class="text-base sm:text-lg font-black text-slate-800 font-cute">오답! 하트를 1개 잃었습니다 💦</h3>
+                    </div>
+                </div>
+
+                <div class="bg-sky-50 rounded-2xl p-3.5 text-xs space-y-2 border border-sky-200">
+                    <div class="text-slate-600">제시된 문장: <span id="modal-statement" class="text-sky-900 font-bold block mt-1"></span></div>
+                    <div class="text-slate-600">올바른 정답: <span id="modal-correct-ans" class="text-emerald-600 font-black text-sm"></span></div>
+                </div>
+
+                <button id="modal-explanation-btn" onclick="closeExplanationModal()" class="w-full py-3 bg-gradient-to-r from-sky-400 to-indigo-500 hover:brightness-105 text-white font-bold text-sm rounded-2xl transition shadow-md">
+                    다음 문제 도전하기 🦦
+                </button>
+            </div>
+        </div>
+
+        <!-- MODAL 2: CHEAT SHEET -->
+        <div id="modal-cheat-sheet" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+            <div class="sky-card w-full max-w-lg max-h-[85vh] rounded-3xl p-4 sm:p-5 border-4 border-sky-300 shadow-2xl flex flex-col space-y-3 overflow-y-auto">
+                <div class="flex items-center justify-between border-b border-sky-200 pb-2">
+                    <div class="flex items-center space-x-2 text-sky-700">
+                        <i class="fa-solid fa-book-open text-xl"></i>
+                        <h3 class="text-base sm:text-lg font-black text-slate-800 font-cute">여러 가지 사각형 핵심 정리</h3>
+                    </div>
+                    <button onclick="toggleCheatSheet()" class="text-slate-400 hover:text-slate-600 p-1">
+                        <i class="fa-solid fa-xmark text-xl"></i>
+                    </button>
+                </div>
+
+                <div class="bg-sky-50 p-3 rounded-2xl border border-sky-200">
+                    <h4 class="text-xs font-bold text-sky-800 mb-2 text-center">📊 사각형 포함 관계</h4>
+                    <div class="text-center text-xs text-slate-700 space-y-1">
+                        <div class="p-1 bg-white rounded-lg border border-sky-200">사다리꼴 (한 쌍 대변 평행)</div>
+                        <div class="text-sky-500 text-[10px]">↓ 다른 한 쌍도 평행</div>
+                        <div class="p-1 bg-sky-100 rounded-lg border border-sky-300 font-bold text-sky-900">평행사변형 (두 쌍 대변 평행)</div>
+                        <div class="grid grid-cols-2 gap-1.5 pt-1">
+                            <div class="p-2 bg-blue-50 rounded-xl border border-blue-200 text-blue-900">
+                                <span class="font-bold block text-blue-700">직사각형</span>
+                                <span class="text-[10px] text-slate-600">한 내각 90° OR<br>대각선 길이 같음</span>
+                            </div>
+                            <div class="p-2 bg-purple-50 rounded-xl border border-purple-200 text-purple-900">
+                                <span class="font-bold block text-purple-700">마름모</span>
+                                <span class="text-[10px] text-slate-600">이웃 두 변 같음 OR<br>대각선 수직 교차</span>
+                            </div>
+                        </div>
+                        <div class="text-pink-500 text-[10px]">↘ 두 조건 결합 ↙</div>
+                        <div class="p-2 bg-emerald-100 rounded-xl border border-emerald-300 text-emerald-900 font-bold">
+                            정사각형 (직사각형 + 마름모 성질 완벽 만족)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <h4 class="text-xs font-bold text-sky-800 mb-1">📐 대각선 핵심 성질</h4>
+                    <table class="w-full text-xs text-left text-slate-700 border-collapse">
+                        <thead>
+                            <tr class="bg-sky-100 text-sky-900 border-b border-sky-200">
+                                <th class="p-2">도형</th>
+                                <th class="p-2">서로 이등분</th>
+                                <th class="p-2">길이 같음</th>
+                                <th class="p-2">서로 수직</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-sky-100">
+                            <tr>
+                                <td class="p-2 font-bold text-sky-700">평행사변형</td>
+                                <td class="p-2 text-emerald-600 font-bold">O</td>
+                                <td class="p-2 text-pink-500 font-bold">X</td>
+                                <td class="p-2 text-pink-500 font-bold">X</td>
+                            </tr>
+                            <tr>
+                                <td class="p-2 font-bold text-blue-700">직사각형</td>
+                                <td class="p-2 text-emerald-600 font-bold">O</td>
+                                <td class="p-2 text-emerald-600 font-bold">O</td>
+                                <td class="p-2 text-pink-500 font-bold">X</td>
+                            </tr>
+                            <tr>
+                                <td class="p-2 font-bold text-purple-700">마름모</td>
+                                <td class="p-2 text-emerald-600 font-bold">O</td>
+                                <td class="p-2 text-pink-500 font-bold">X</td>
+                                <td class="p-2 text-emerald-600 font-bold">O</td>
+                            </tr>
+                            <tr>
+                                <td class="p-2 font-bold text-emerald-700">정사각형</td>
+                                <td class="p-2 text-emerald-600 font-bold">O</td>
+                                <td class="p-2 text-emerald-600 font-bold">O</td>
+                                <td class="p-2 text-emerald-600 font-bold">O</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <button onclick="toggleCheatSheet()" class="w-full py-2.5 bg-sky-100 hover:bg-sky-200 text-sky-800 font-bold text-xs rounded-xl transition">
+                    닫기
+                </button>
+            </div>
+        </div>
+
+        <!-- MODAL 3: GAME OVER / VICTORY MODAL -->
+        <div id="modal-gameover" class="fixed inset-0 bg-slate-900/70 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+            <div class="sky-card w-full max-w-sm rounded-3xl p-6 text-center space-y-4 border-4 border-white shadow-2xl">
+                <div id="gameover-icon" class="text-6xl animate-bounce">🦦</div>
+
+                <div class="space-y-1">
+                    <h3 id="gameover-title" class="text-2xl font-black text-sky-900 font-cute">등반 종료!</h3>
+                    <p id="gameover-sub" class="text-xs text-slate-600 font-semibold">아쉽게 하늘 계단에서 미끄러졌습니다!</p>
+                </div>
+
+                <div class="bg-sky-50 rounded-2xl p-3 border border-sky-200 grid grid-cols-2 gap-2 text-xs font-bold">
+                    <div class="bg-white p-2 rounded-xl text-sky-800">
+                        <span class="block text-[10px] text-slate-500 font-normal">도달 층수</span>
+                        <span id="final-floor" class="text-base text-amber-500 font-black font-cute">0 / 100F</span>
+                    </div>
+                    <div class="bg-white p-2 rounded-xl text-sky-800">
+                        <span class="block text-[10px] text-slate-500 font-normal">최대 콤보</span>
+                        <span id="final-combo" class="text-base text-pink-500 font-black font-cute">0</span>
+                    </div>
+                </div>
+
+                <button onclick="startGame()" class="w-full py-3 bg-gradient-to-r from-sky-400 to-indigo-500 hover:brightness-105 text-white font-bold text-base rounded-2xl transition shadow-md font-cute border-2 border-white">
+                    다시 도전하기 🦦
+                </button>
+                <button onclick="resetToHome()" class="w-full py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xs rounded-xl transition">
+                    처음으로 돌아가기
+                </button>
+            </div>
+        </div>
+
+        <!-- MODAL 4: PAUSE MODAL -->
+        <div id="modal-pause" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+            <div class="sky-card w-full max-w-xs rounded-3xl p-5 text-center space-y-4 border-4 border-amber-300 shadow-2xl">
+                <div class="text-5xl animate-bounce">⏸️</div>
+
+                <div class="space-y-1">
+                    <h3 class="text-2xl font-black text-sky-900 font-cute">일시 정지</h3>
+                    <p class="text-xs text-slate-600 font-semibold">잠시 쉬어가시는 중입니다 🦦</p>
+                </div>
+
+                <div class="space-y-2 pt-2">
+                    <button onclick="togglePause()" class="w-full py-3 bg-gradient-to-r from-sky-400 to-indigo-500 hover:brightness-105 text-white font-bold text-sm rounded-2xl transition shadow-md flex items-center justify-center gap-2 font-cute text-lg">
+                        <i class="fa-solid fa-play"></i>
+                        <span>계속 오르기</span>
+                    </button>
+                    <button onclick="resetToHome()" class="w-full py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xs rounded-2xl transition">
+                        처음으로 돌아가기
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="w-full max-w-lg text-center py-1 text-xs text-sky-900/80 font-bold z-10">
+        중학교 2학년 수학 2학기 여러가지 사각형 | 100층 도전을 완료하세요!
+    </footer>
+
+    <script>
+        /* ===================================================================
+           QUESTION BANK (25 Quadrilateral Propositions with True/False)
+           =================================================================== */
+        const QUESTION_BANK = [
+            { statement: "모든 정사각형은 직사각형이다.", answer: "O" },
+            { statement: "모든 직사각형은 마름모이다.", answer: "X" },
+            { statement: "모든 마름모는 평행사변형이다.", answer: "O" },
+            { statement: "모든 평행사변형은 직사각형이다.", answer: "X" },
+            { statement: "정사각형은 직사각형이면서 동시에 마름모이다.", answer: "O" },
+            { statement: "모든 사각형은 평행사변형이다.", answer: "X" },
+            { statement: "직사각형은 두 대각선의 길이가 같다.", answer: "O" },
+            { statement: "직사각형은 두 대각선이 서로 수직이다.", answer: "X" },
+            { statement: "평행사변형은 두 대각선의 길이가 같다.", answer: "X" },
+            { statement: "평행사변형은 두 대각선이 서로를 이등분한다.", answer: "O" },
+            { statement: "직사각형은 두 대각선이 서로를 이등분한다.", answer: "O" },
+            { statement: "마름모는 두 대각선이 서로 수직으로 만난다.", answer: "O" },
+            { statement: "마름모는 두 대각선의 길이가 같다.", answer: "X" },
+            { statement: "마름모의 네 내각의 크기는 모두 같다.", answer: "X" },
+            { statement: "정사각형의 두 대각선은 길이가 같고 서로 수직이다.", answer: "O" },
+            { statement: "모든 평행사변형은 마름모이다.", answer: "X" },
+            { statement: "모든 정사각형은 평행사변형이다.", answer: "O" },
+            { statement: "모든 직사각형은 평행사변형이다.", answer: "O" },
+            { statement: "한 내각이 직각인 평행사변형은 직사각형이다.", answer: "O" },
+            { statement: "한 내각이 직각인 평행사변형은 마름모이다.", answer: "X" },
+            { statement: "이웃하는 두 변의 길이가 같은 평행사변형은 마름모이다.", answer: "O" },
+            { statement: "이웃하는 두 변의 길이가 같은 평행사변형은 직사각형이다.", answer: "X" },
+            { statement: "이웃하는 두 변의 길이가 같은 직사각형은 정사각형이다.", answer: "O" },
+            { statement: "한 내각이 직각인 마름모는 정사각형이다.", answer: "O" },
+            { statement: "한 내각이 직각인 마름모는 직사각형이다.", answer: "O" }
+        ];
+
+        const TARGET_FLOOR = 100;
+
+        let gameState = {
+            floor: 0,
+            combo: 0,
+            maxCombo: 0,
+            lives: 3,
+            timer: 100,
+            timerInterval: null,
+            currentQuestion: null,
+            lastQuestionIndex: -1,
+            leftOption: 'O',
+            rightOption: 'X',
+            isAudioInitialized: false,
+            isHopping: false,
+            isPaused: false
+        };
+
+        let synth;
+
+        function initAudio() {
+            if (gameState.isAudioInitialized) return;
+            try {
+                Tone.start();
+                synth = new Tone.PolySynth(Tone.Synth).toDestination();
+                synth.volume.value = -12;
+                gameState.isAudioInitialized = true;
+            } catch (e) {}
+        }
+
+        function playSound(type) {
+            if (!gameState.isAudioInitialized || !synth) return;
+            try {
+                const now = Tone.now();
+                if (type === 'step') {
+                    const pitch = 60 + Math.min(gameState.combo * 2, 24);
+                    synth.triggerAttackRelease(Tone.Frequency(pitch, "midi").toNote(), "16n", now);
+                } else if (type === 'fail') {
+                    synth.triggerAttackRelease(["C3", "F#2"], "8n", now);
+                } else if (type === 'fever') {
+                    synth.triggerAttackRelease(["C5", "E5", "G5", "C6"], "8n", now);
+                } else if (type === 'victory') {
+                    synth.triggerAttackRelease(["C4", "E4", "G4", "C5", "E5", "G5"], "4n", now);
+                }
+            } catch(e) {}
+        }
+
+        function updateHUD() {
+            const floorEl = document.getElementById('floor-counter');
+            if (floorEl) {
+                floorEl.innerText = `${gameState.floor} / ${TARGET_FLOOR}F`;
+            }
+
+            const comboEl = document.getElementById('combo-badge');
+            if (comboEl) {
+                comboEl.innerText = `🔥 ${gameState.combo} 콤보`;
+            }
+
+            const heartsContainer = document.getElementById('hearts-container');
+            if (heartsContainer) {
+                heartsContainer.innerHTML = '';
+                for (let i = 0; i < 3; i++) {
+                    const heart = document.createElement('i');
+                    if (i < gameState.lives) {
+                        heart.className = 'fa-solid fa-heart text-pink-500 text-sm sm:text-lg animate-pulse';
+                    } else {
+                        heart.className = 'fa-solid fa-heart text-slate-300 text-sm sm:text-lg opacity-40';
+                    }
+                    heartsContainer.appendChild(heart);
+                }
+            }
+        }
+
+        function startTimer() {
+            clearInterval(gameState.timerInterval);
+            gameState.timer = 100;
+            const timerBar = document.getElementById('timer-bar');
+            if (timerBar) timerBar.style.width = '100%';
+
+            gameState.timerInterval = setInterval(() => {
+                if (gameState.isPaused) return;
+
+                gameState.timer -= 1;
+                if (timerBar) {
+                    timerBar.style.width = `${gameState.timer}%`;
+                }
+
+                if (gameState.timer <= 0) {
+                    clearInterval(gameState.timerInterval);
+                    timeOutFail();
+                }
+            }, 100); // 100ms * 100 = 10 Seconds
+        }
+
+        function startGame() {
+            initAudio();
+            gameState.floor = 0;
+            gameState.combo = 0;
+            gameState.maxCombo = 0;
+            gameState.lives = 3;
+            gameState.timer = 100;
+            gameState.lastQuestionIndex = -1;
+            gameState.isHopping = false;
+            gameState.isPaused = false;
+
+            document.getElementById('screen-start').classList.add('hidden');
+            document.getElementById('screen-game').classList.remove('hidden');
+
+            renderStairGraphic();
+            updateHUD();
+            startTimer();
+            nextQuestion();
+        }
+
+        function nextQuestion() {
+            if (gameState.floor >= TARGET_FLOOR) {
+                triggerVictory();
+                return;
+            }
+            
+            let randomIndex;
+            do {
+                randomIndex = Math.floor(Math.random() * QUESTION_BANK.length);
+            } while (QUESTION_BANK.length > 1 && randomIndex === gameState.lastQuestionIndex);
+
+            gameState.lastQuestionIndex = randomIndex;
+            gameState.currentQuestion = QUESTION_BANK[randomIndex];
+            
+            const qEl = document.getElementById('question-text');
+            if (qEl) {
+                qEl.innerText = gameState.currentQuestion.statement;
+            }
+        }
+
+        function resetToHome() {
+            clearInterval(gameState.timerInterval);
+            gameState.isPaused = false;
+            document.getElementById('modal-gameover').classList.add('hidden');
+            document.getElementById('modal-explanation').classList.add('hidden');
+            document.getElementById('modal-cheat-sheet').classList.add('hidden');
+            document.getElementById('modal-pause').classList.add('hidden');
+
+            document.getElementById('screen-game').classList.add('hidden');
+            document.getElementById('screen-start').classList.remove('hidden');
+            
+            gameState.floor = 0;
+            updateHUD();
+        }
+
+        function togglePause() {
+            if (document.getElementById('screen-game').classList.contains('hidden')) return;
+            
+            gameState.isPaused = !gameState.isPaused;
+            const pauseModal = document.getElementById('modal-pause');
+
+            if (gameState.isPaused) {
+                clearInterval(gameState.timerInterval);
+                if (pauseModal) pauseModal.classList.remove('hidden');
+            } else {
+                if (pauseModal) pauseModal.classList.add('hidden');
+                startTimer();
+            }
+        }
+
+        function renderStairGraphic() {
+            const wrapper = document.getElementById('stairs-wrapper');
+            if (!wrapper) return;
+            wrapper.innerHTML = '';
+
+            const visibleSteps = 6;
+            const stepXInterval = 34;
+            const stepYInterval = 42;
+            const baseX = 20;
+            const baseY = 24;
+
+            for (let i = -1; i < visibleSteps; i++) {
+                const stepNum = gameState.floor + i;
+                if (stepNum < 0) continue;
+
+                const tile = document.createElement('div');
+                const offsetX = (i * stepXInterval) + baseX;
+                const offsetY = (i * stepYInterval) + baseY;
+
+                tile.style.bottom = `${offsetY}px`;
+                tile.style.left = `${offsetX}px`;
+                tile.style.zIndex = visibleSteps - i;
+
+                if (i === 0) {
+                    tile.className = `absolute stair-block-dark-3d w-44 sm:w-56 h-8 sm:h-9 border-2 flex items-center justify-between px-3 text-xs sm:text-sm font-black font-cute transition-all`;
+                    tile.style.background = 'linear-gradient(180deg, #652b12 0%, #3a1205 100%)';
+                    tile.style.color = '#fef08a';
+                    tile.style.borderColor = '#b45309';
+                } else {
+                    tile.className = `absolute stair-block-light-3d w-44 sm:w-56 h-8 sm:h-9 border-2 flex items-center justify-between px-3 text-xs sm:text-sm font-black font-cute transition-all`;
+                    const isEven = stepNum % 2 === 0;
+                    tile.style.background = isEven 
+                        ? 'linear-gradient(180deg, #fef3c7 0%, #fde68a 100%)' 
+                        : 'linear-gradient(180deg, #fef9c3 0%, #fef08a 100%)';
+                    tile.style.color = '#92400e';
+                    tile.style.borderColor = '#f59e0b';
+                }
+
+                tile.innerHTML = `
+                    <span class="text-[10px] opacity-80">${i === 0 ? '🪵' : '🧱'}</span>
+                    <span class="drop-shadow-md text-xs sm:text-sm font-black tracking-wide">${stepNum >= TARGET_FLOOR ? '👑 100F' : `${stepNum}F`}</span>
+                    <span class="text-[10px] opacity-80">${i === 0 ? '🪵' : '🧱'}</span>
+                `;
+
+                wrapper.appendChild(tile);
+
+                /* Align Otter feet exactly at the vertical midpoint of the current step (+16px) */
+                if (i === 0) {
+                    const avatar = document.getElementById('player-avatar');
+                    if (avatar) {
+                        avatar.style.bottom = `${offsetY + 16}px`;
+                        avatar.style.left = `${offsetX + 50}px`;
+                    }
+                }
+            }
+        }
+
+        function makeChoice(selectedSide) {
+            initAudio();
+            if (gameState.isHopping || gameState.isPaused) return;
+
+            const chosenAnswer = selectedSide === 'left' ? gameState.leftOption : gameState.rightOption;
+            const isCorrect = chosenAnswer === gameState.currentQuestion.answer;
+
+            if (isCorrect) {
+                playSound('step');
+                gameState.combo++;
+                if (gameState.combo > gameState.maxCombo) gameState.maxCombo = gameState.combo;
+                if (gameState.combo === 5) playSound('fever');
+
+                gameState.isHopping = true;
+
+                const avatar = document.getElementById('player-avatar');
+                const dust = document.getElementById('jump-dust');
+                const wrapper = document.getElementById('stairs-wrapper');
+
+                if (avatar) {
+                    avatar.classList.remove('animate-stair-hop');
+                    void avatar.offsetWidth;
+                    avatar.classList.add('animate-stair-hop');
+                }
+
+                if (wrapper) {
+                    wrapper.style.transition = 'transform 0.22s cubic-bezier(0.25, 1, 0.5, 1)';
+                    wrapper.style.transform = 'translate(-34px, 42px)';
+                }
+
+                if (dust) {
+                    dust.style.opacity = '1';
+                    setTimeout(() => { dust.style.opacity = '0'; }, 180);
+                }
+
+                setTimeout(() => {
+                    gameState.floor++;
+                    if (avatar) avatar.classList.remove('animate-stair-hop');
+                    if (wrapper) {
+                        wrapper.style.transition = 'none';
+                        wrapper.style.transform = 'translate(0, 0)';
+                    }
+                    updateHUD();
+                    renderStairGraphic();
+                    gameState.isHopping = false;
+                    nextQuestion();
+                    startTimer();
+                }, 220);
+
+            } else {
+                handleFail(chosenAnswer);
+            }
+        }
+
+        function timeOutFail() {
+            playSound('fail');
+            gameState.combo = 0;
+            gameState.lives--;
+
+            if (gameState.lives <= 0) {
+                gameState.floor = 0;
+                updateHUD();
+                renderStairGraphic();
+                finishGame(false);
+            } else {
+                updateHUD();
+                renderStairGraphic();
+                nextQuestion();
+                startTimer();
+            }
+        }
+
+        function handleFail(chosenAnswer) {
+            playSound('fail');
+            gameState.combo = 0;
+            gameState.lives--;
+
+            if (gameState.lives <= 0) {
+                gameState.floor = 0;
+            }
+
+            updateHUD();
+            renderStairGraphic();
+
+            const q = gameState.currentQuestion;
+
+            document.getElementById('modal-statement').innerText = `"${q.statement}"`;
+            document.getElementById('modal-correct-ans').innerText = `${q.answer} (${q.answer === 'O' ? '참' : '거짓'}) [내가 선택한 답: ${chosenAnswer}]`;
+
+            const titleEl = document.getElementById('modal-explanation-title');
+            const btnEl = document.getElementById('modal-explanation-btn');
+
+            if (gameState.lives > 0) {
+                if (titleEl) titleEl.innerText = `오답! 하트를 1개 잃었습니다 💦 (남은 하트: ${gameState.lives}개)`;
+                if (btnEl) btnEl.innerText = `다음 문제 도전하기 🦦`;
+            } else {
+                if (titleEl) titleEl.innerText = `하트 모두 소진! 0층으로 추락했습니다 💦`;
+                if (btnEl) btnEl.innerText = `0층에서 다시 도전하기 🦦`;
+            }
+
+            document.getElementById('modal-explanation').classList.remove('hidden');
+        }
+
+        function closeExplanationModal() {
+            document.getElementById('modal-explanation').classList.add('hidden');
+
+            if (gameState.lives <= 0) {
+                finishGame(false);
+            } else {
+                nextQuestion();
+                startTimer();
+            }
+        }
+
+        function triggerVictory() {
+            playSound('victory');
+            finishGame(true);
+        }
+
+        function finishGame(isVictory = false) {
+            clearInterval(gameState.timerInterval);
+            
+            const iconEl = document.getElementById('gameover-icon');
+            const titleEl = document.getElementById('gameover-title');
+            const subEl = document.getElementById('gameover-sub');
+
+            document.getElementById('final-floor').innerText = `${gameState.floor} / ${TARGET_FLOOR}F`;
+            document.getElementById('final-combo').innerText = gameState.maxCombo;
+
+            if (isVictory) {
+                iconEl.innerText = '👑🦦';
+                titleEl.innerText = '100층 정상 정복!';
+                subEl.innerText = '축하합니다! 사각형 개념의 마스터가 되셨습니다! 🎉';
+            } else {
+                iconEl.innerText = '🦦💧';
+                titleEl.innerText = '등반 종료!';
+                subEl.innerText = '아쉽게 하늘 계단에서 미끄러졌습니다!';
+            }
+
+            document.getElementById('modal-gameover').classList.remove('hidden');
+        }
+
+        function toggleCheatSheet() {
+            initAudio();
+            const modal = document.getElementById('modal-cheat-sheet');
+            modal.classList.toggle('hidden');
+        }
+
+        /* Keyboard Controls: Left / Right Arrows & Escape/P for Pause */
+        window.addEventListener('keydown', (e) => {
+            if (document.getElementById('screen-game').classList.contains('hidden')) return;
+            if (!document.getElementById('modal-explanation').classList.contains('hidden')) return;
+
+            if (e.key === 'p' || e.key === 'P' || e.key === 'Escape') {
+                togglePause();
+                return;
+            }
+
+            if (gameState.isPaused) return;
+
+            if (e.key === 'ArrowLeft') {
+                makeChoice('left');
+            } else if (e.key === 'ArrowRight') {
+                makeChoice('right');
+            }
+        });
+    </script>
+</body>
+</html>
