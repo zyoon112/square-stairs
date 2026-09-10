@@ -173,6 +173,12 @@
                 <i class="fa-solid fa-heart text-pink-500 text-sm sm:text-lg animate-pulse"></i>
             </div>
 
+            <!-- Total Remaining Time Counter -->
+            <div class="text-right bg-sky-100/90 px-2 py-1 rounded-xl border border-sky-200 shadow-inner">
+                <span class="text-[9px] text-sky-700 font-bold block leading-none">남은 시간</span>
+                <span id="total-time-display" class="text-xs sm:text-sm font-black text-rose-600 font-cute">05:00</span>
+            </div>
+
             <!-- Floor Counter -->
             <div class="text-right">
                 <span class="text-[10px] text-sky-600 font-bold block leading-none">현재 / 목표</span>
@@ -194,7 +200,7 @@
     <main class="w-full max-w-lg flex-1 flex flex-col items-center justify-start relative my-0.5 z-10 min-h-0">
 
         <!-- SCREEN 1: START SCREEN -->
-        <div id="screen-start" class="w-full sky-card rounded-3xl p-4 sm:p-6 text-center shadow-2xl flex flex-col items-center space-y-3 sm:space-y-4 border-4 border-white my-auto">
+        <div id="screen-start" class="w-full sky-card rounded-3xl p-5 sm:p-8 text-center shadow-2xl flex flex-col items-center space-y-4 sm:space-y-6 border-4 border-white my-auto">
             
             <div class="relative py-2">
                 <div class="w-24 h-28 sm:w-28 sm:h-32 flex items-center justify-center animate-float-slow">
@@ -223,26 +229,32 @@
                         <polygon points="50,68 53,74 59,75 55,79 56,85 50,82 44,85 45,79 41,75 47,74" fill="#FFD700" stroke="#DAA520" stroke-width="1"/>
                     </svg>
                 </div>
-                <span class="absolute -bottom-1 right-0 bg-amber-400 text-slate-900 text-[10px] sm:text-xs font-black px-2.5 py-0.5 rounded-full shadow border-2 border-white">중2 수학</span>
             </div>
 
-            <div class="space-y-1">
+            <div class="space-y-1.5">
                 <h2 class="text-2xl sm:text-4xl font-black text-sky-900 font-cute">수달의 하늘 계단 O/X</h2>
                 <p class="text-slate-600 text-xs sm:text-sm leading-relaxed max-w-xs mx-auto font-semibold">
                     여러 가지 사각형 성질 문항이 <span class="text-sky-600 font-bold">참(O)</span>인지 <span class="text-pink-500 font-bold">거짓(X)</span>인지 판단하세요!<br>
-                    하트 3개를 모두 잃으면 <span class="text-red-500 font-bold">0층으로 추락</span>하니 신중하게 100층까지 올라가세요! ☁️✨
+                    하트 3개를 모두 잃으면 등반이 종료되니 신중하게 100층까지 올라가세요! ☁️✨
                 </p>
             </div>
 
-            <!-- Quadrilateral Tags -->
-            <div class="flex flex-wrap justify-center gap-1 max-w-xs text-[11px] sm:text-xs font-bold compact-hide">
-                <span class="px-2 py-0.5 rounded-full bg-sky-100 text-sky-700 border border-sky-300">평행사변형</span>
-                <span class="px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 border border-blue-300">직사각형</span>
-                <span class="px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 border border-purple-300">마름모</span>
-                <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 border border-emerald-300">정사각형</span>
+            <!-- Time Limit Selection -->
+            <div class="w-full max-w-xs space-y-2 pt-2">
+                <span class="text-xs sm:text-sm font-black text-sky-800 flex items-center justify-center gap-1">
+                    <i class="fa-solid fa-clock text-amber-500"></i> 제한 시간 선택
+                </span>
+                <div class="grid grid-cols-2 gap-2">
+                    <button id="btn-time-5" onclick="selectTimeLimit(5)" class="py-2.5 px-3 rounded-2xl font-bold text-xs sm:text-sm border-2 transition bg-sky-500 text-white border-sky-600 shadow-md transform active:scale-95">
+                        ⏱️ 5분 도전
+                    </button>
+                    <button id="btn-time-10" onclick="selectTimeLimit(10)" class="py-2.5 px-3 rounded-2xl font-bold text-xs sm:text-sm border-2 transition bg-white text-slate-600 border-slate-200 hover:bg-slate-50 shadow-sm">
+                        ⏱️ 10분 도전
+                    </button>
+                </div>
             </div>
 
-            <button onclick="startGame()" class="w-full py-3 sm:py-4 bg-gradient-to-r from-sky-400 via-sky-500 to-indigo-500 hover:brightness-105 text-white font-black text-base sm:text-xl rounded-2xl shadow-lg transition transform active:scale-95 font-cute flex items-center justify-center gap-2 border-2 border-white">
+            <button onclick="startGame()" class="w-full max-w-xs py-3.5 sm:py-4 bg-gradient-to-r from-sky-400 via-sky-500 to-indigo-500 hover:brightness-105 text-white font-black text-base sm:text-xl rounded-2xl shadow-lg transition transform active:scale-95 font-cute flex items-center justify-center gap-2 border-2 border-white mt-2">
                 <i class="fa-solid fa-play"></i>
                 <span>등반 시작하기 (100F 도전!)</span>
             </button>
@@ -444,7 +456,7 @@
                     </div>
                 </div>
 
-                <button onclick="startGame()" class="w-full py-3 bg-gradient-to-r from-sky-400 to-indigo-500 hover:brightness-105 text-white font-bold text-base rounded-2xl transition shadow-md font-cute border-2 border-white">
+                <button onclick="startGame()" class="w-full py-3 bg-gradient-to-r from-sky-400 to-indigo-500 hover:brightness-105 text-white font-black text-base rounded-2xl transition shadow-md font-cute border-2 border-white">
                     다시 도전하기 🦦
                 </button>
                 <button onclick="resetToHome()" class="w-full py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xs rounded-xl transition">
@@ -455,31 +467,26 @@
 
         <!-- MODAL 4: PAUSE MODAL -->
         <div id="modal-pause" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-            <div class="sky-card w-full max-w-xs rounded-3xl p-5 text-center space-y-4 border-4 border-amber-300 shadow-2xl">
+            <div class="sky-card w-full max-w-sm rounded-3xl p-6 text-center space-y-4 border-4 border-white shadow-2xl">
                 <div class="text-5xl animate-bounce">⏸️</div>
-
                 <div class="space-y-1">
                     <h3 class="text-2xl font-black text-sky-900 font-cute">일시 정지</h3>
-                    <p class="text-xs text-slate-600 font-semibold">잠시 쉬어가시는 중입니다 🦦</p>
+                    <p class="text-xs text-slate-600 font-semibold">잠시 휴식 중입니다!</p>
                 </div>
-
-                <div class="space-y-2 pt-2">
-                    <button onclick="togglePause()" class="w-full py-3 bg-gradient-to-r from-sky-400 to-indigo-500 hover:brightness-105 text-white font-bold text-sm rounded-2xl transition shadow-md flex items-center justify-center gap-2 font-cute text-lg">
-                        <i class="fa-solid fa-play"></i>
-                        <span>계속 오르기</span>
-                    </button>
-                    <button onclick="resetToHome()" class="w-full py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xs rounded-2xl transition">
-                        처음으로 돌아가기
-                    </button>
-                </div>
+                <button onclick="togglePause()" class="w-full py-3 bg-gradient-to-r from-sky-400 to-indigo-500 hover:brightness-105 text-white font-bold text-sm sm:text-base rounded-2xl transition shadow-md font-cute border-2 border-white">
+                    이어서 하기 ▶️
+                </button>
+                <button onclick="resetToHome()" class="w-full py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xs rounded-xl transition">
+                    처음으로 돌아가기
+                </button>
             </div>
         </div>
 
     </main>
 
-    <footer class="w-full max-w-lg text-center py-1 text-xs text-sky-900/80 font-bold z-10">
-        <div>중학교 2학년 수학 2학기 여러가지 사각형 | 100층 도전을 완료하세요!</div>
-        <div class="text-[11px] text-sky-800/70 font-normal mt-0.5">Created by zyoont | © zyoont. All rights reserved.</div>
+    <!-- Footer Copyright -->
+    <footer class="w-full text-center py-2 text-xs font-semibold text-sky-900/80 drop-shadow-sm z-10">
+        © zyoont. All rights reserved.
     </footer>
 
     <script>
@@ -522,6 +529,9 @@
             maxCombo: 0,
             lives: 3,
             timer: 100,
+            selectedTimeLimitSec: 300, // 기본 5분 (300초)
+            totalRemainingSec: 300,
+            totalTimerInterval: null,
             timerInterval: null,
             currentQuestion: null,
             lastQuestionIndex: -1,
@@ -533,45 +543,49 @@
         };
 
         let synth;
+        let polySynth;
 
+        /* Audio initialization using Tone.js */
         function initAudio() {
             if (gameState.isAudioInitialized) return;
             try {
-                Tone.start();
-                synth = new Tone.PolySynth(Tone.Synth).toDestination();
-                synth.volume.value = -12;
-                gameState.isAudioInitialized = true;
-            } catch (e) {}
+                if (window.Tone) {
+                    Tone.start();
+                    synth = new Tone.Synth().toDestination();
+                    polySynth = new Tone.PolySynth().toDestination();
+                    gameState.isAudioInitialized = true;
+                }
+            } catch (e) {
+                console.error("Audio initialization error:", e);
+            }
         }
 
+        /* Sound effect player */
         function playSound(type) {
             if (!gameState.isAudioInitialized || !synth) return;
             try {
                 const now = Tone.now();
                 if (type === 'step') {
-                    const pitch = 60 + Math.min(gameState.combo * 2, 24);
-                    synth.triggerAttackRelease(Tone.Frequency(pitch, "midi").toNote(), "16n", now);
-                } else if (type === 'fail') {
-                    synth.triggerAttackRelease(["C3", "F#2"], "8n", now);
+                    const notes = ['C5', 'E5', 'G5', 'A5', 'C6'];
+                    const note = notes[gameState.combo % notes.length];
+                    synth.triggerAttackRelease(note, '8n', now);
                 } else if (type === 'fever') {
-                    synth.triggerAttackRelease(["C5", "E5", "G5", "C6"], "8n", now);
+                    if (polySynth) polySynth.triggerAttackRelease(['C5', 'E5', 'G5', 'C6'], '4n', now);
+                } else if (type === 'fail') {
+                    synth.triggerAttackRelease('A2', '4n', now);
                 } else if (type === 'victory') {
-                    synth.triggerAttackRelease(["C4", "E4", "G4", "C5", "E5", "G5"], "4n", now);
+                    if (polySynth) {
+                        polySynth.triggerAttackRelease(['C5', 'E5', 'G5'], '8n', now);
+                        polySynth.triggerAttackRelease(['G5', 'C6'], '4n', now + 0.2);
+                    }
                 }
-            } catch(e) {}
+            } catch (e) {
+                console.error("Sound playback error:", e);
+            }
         }
 
+        /* HUD update helper function */
         function updateHUD() {
-            const floorEl = document.getElementById('floor-counter');
-            if (floorEl) {
-                floorEl.innerText = `${gameState.floor} / ${TARGET_FLOOR}F`;
-            }
-
-            const comboEl = document.getElementById('combo-badge');
-            if (comboEl) {
-                comboEl.innerText = `🔥 ${gameState.combo} 콤보`;
-            }
-
             const heartsContainer = document.getElementById('hearts-container');
             if (heartsContainer) {
                 heartsContainer.innerHTML = '';
@@ -580,11 +594,70 @@
                     if (i < gameState.lives) {
                         heart.className = 'fa-solid fa-heart text-pink-500 text-sm sm:text-lg animate-pulse';
                     } else {
-                        heart.className = 'fa-solid fa-heart text-slate-300 text-sm sm:text-lg opacity-40';
+                        heart.className = 'fa-solid fa-heart text-slate-300 text-sm sm:text-lg';
                     }
                     heartsContainer.appendChild(heart);
                 }
             }
+
+            const floorCounter = document.getElementById('floor-counter');
+            if (floorCounter) {
+                floorCounter.innerText = `${gameState.floor} / ${TARGET_FLOOR}F`;
+            }
+
+            const comboBadge = document.getElementById('combo-badge');
+            if (comboBadge) {
+                comboBadge.innerText = `🔥 ${gameState.combo} 콤보`;
+            }
+        }
+
+        function selectTimeLimit(mins) {
+            gameState.selectedTimeLimitSec = mins * 60;
+            const btn5 = document.getElementById('btn-time-5');
+            const btn10 = document.getElementById('btn-time-10');
+
+            if (mins === 5) {
+                if (btn5) btn5.className = "py-2.5 px-3 rounded-2xl font-bold text-xs sm:text-sm border-2 transition bg-sky-500 text-white border-sky-600 shadow-md transform active:scale-95";
+                if (btn10) btn10.className = "py-2.5 px-3 rounded-2xl font-bold text-xs sm:text-sm border-2 transition bg-white text-slate-600 border-slate-200 hover:bg-slate-50 shadow-sm";
+            } else {
+                if (btn5) btn5.className = "py-2.5 px-3 rounded-2xl font-bold text-xs sm:text-sm border-2 transition bg-white text-slate-600 border-slate-200 hover:bg-slate-50 shadow-sm";
+                if (btn10) btn10.className = "py-2.5 px-3 rounded-2xl font-bold text-xs sm:text-sm border-2 transition bg-sky-500 text-white border-sky-600 shadow-md transform active:scale-95";
+            }
+
+            const timeDisplay = document.getElementById('total-time-display');
+            if (timeDisplay) {
+                timeDisplay.innerText = formatTime(gameState.selectedTimeLimitSec);
+            }
+        }
+
+        function formatTime(totalSeconds) {
+            const m = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
+            const s = (totalSeconds % 60).toString().padStart(2, '0');
+            return `${m}:${s}`;
+        }
+
+        function startTotalTimer() {
+            clearInterval(gameState.totalTimerInterval);
+            gameState.totalRemainingSec = gameState.selectedTimeLimitSec;
+
+            const timeDisplay = document.getElementById('total-time-display');
+            if (timeDisplay) timeDisplay.innerText = formatTime(gameState.totalRemainingSec);
+
+            gameState.totalTimerInterval = setInterval(() => {
+                if (gameState.isPaused) return;
+
+                gameState.totalRemainingSec -= 1;
+                if (timeDisplay) {
+                    timeDisplay.innerText = formatTime(Math.max(0, gameState.totalRemainingSec));
+                }
+
+                if (gameState.totalRemainingSec <= 0) {
+                    clearInterval(gameState.totalTimerInterval);
+                    clearInterval(gameState.timerInterval);
+                    playSound('fail');
+                    finishGame(false);
+                }
+            }, 1000);
         }
 
         function startTimer() {
@@ -605,7 +678,7 @@
                     clearInterval(gameState.timerInterval);
                     timeOutFail();
                 }
-            }, 100); // 100ms * 100 = 10 Seconds
+            }, 100);
         }
 
         function startGame() {
@@ -619,11 +692,17 @@
             gameState.isHopping = false;
             gameState.isPaused = false;
 
+            ['modal-gameover', 'modal-explanation', 'modal-cheat-sheet', 'modal-pause'].forEach(id => {
+                const modal = document.getElementById(id);
+                if (modal) modal.classList.add('hidden');
+            });
+
             document.getElementById('screen-start').classList.add('hidden');
             document.getElementById('screen-game').classList.remove('hidden');
 
             renderStairGraphic();
             updateHUD();
+            startTotalTimer();
             startTimer();
             nextQuestion();
         }
@@ -650,14 +729,18 @@
 
         function resetToHome() {
             clearInterval(gameState.timerInterval);
+            clearInterval(gameState.totalTimerInterval);
             gameState.isPaused = false;
-            document.getElementById('modal-gameover').classList.add('hidden');
-            document.getElementById('modal-explanation').classList.add('hidden');
-            document.getElementById('modal-cheat-sheet').classList.add('hidden');
-            document.getElementById('modal-pause').classList.add('hidden');
+            
+            ['modal-gameover', 'modal-explanation', 'modal-cheat-sheet', 'modal-pause'].forEach(id => {
+                const modal = document.getElementById(id);
+                if (modal) modal.classList.add('hidden');
+            });
 
-            document.getElementById('screen-game').classList.add('hidden');
-            document.getElementById('screen-start').classList.remove('hidden');
+            const screenGame = document.getElementById('screen-game');
+            const screenStart = document.getElementById('screen-start');
+            if (screenGame) screenGame.classList.add('hidden');
+            if (screenStart) screenStart.classList.remove('hidden');
             
             gameState.floor = 0;
             updateHUD();
@@ -670,11 +753,16 @@
             const pauseModal = document.getElementById('modal-pause');
 
             if (gameState.isPaused) {
-                clearInterval(gameState.timerInterval);
                 if (pauseModal) pauseModal.classList.remove('hidden');
             } else {
                 if (pauseModal) pauseModal.classList.add('hidden');
-                startTimer();
+            }
+        }
+
+        function toggleCheatSheet() {
+            const modal = document.getElementById('modal-cheat-sheet');
+            if (modal) {
+                modal.classList.toggle('hidden');
             }
         }
 
@@ -795,7 +883,6 @@
             gameState.lives--;
 
             if (gameState.lives <= 0) {
-                gameState.floor = 0;
                 updateHUD();
                 renderStairGraphic();
                 finishGame(false);
@@ -812,10 +899,6 @@
             gameState.combo = 0;
             gameState.lives--;
 
-            if (gameState.lives <= 0) {
-                gameState.floor = 0;
-            }
-
             updateHUD();
             renderStairGraphic();
 
@@ -831,10 +914,11 @@
                 if (titleEl) titleEl.innerText = `오답! 하트를 1개 잃었습니다 💦 (남은 하트: ${gameState.lives}개)`;
                 if (btnEl) btnEl.innerText = `다음 문제 도전하기 🦦`;
             } else {
-                if (titleEl) titleEl.innerText = `하트 모두 소진! 0층으로 추락했습니다 💦`;
-                if (btnEl) btnEl.innerText = `0층에서 다시 도전하기 🦦`;
+                if (titleEl) titleEl.innerText = `하트 모두 소진! 등반이 종료되었습니다 💦`;
+                if (btnEl) btnEl.innerText = `결과 확인하기 🦦`;
             }
 
+            gameState.isPaused = true;
             document.getElementById('modal-explanation').classList.remove('hidden');
         }
 
@@ -844,6 +928,7 @@
             if (gameState.lives <= 0) {
                 finishGame(false);
             } else {
+                gameState.isPaused = false;
                 nextQuestion();
                 startTimer();
             }
@@ -856,6 +941,7 @@
 
         function finishGame(isVictory = false) {
             clearInterval(gameState.timerInterval);
+            clearInterval(gameState.totalTimerInterval);
             
             const iconEl = document.getElementById('gameover-icon');
             const titleEl = document.getElementById('gameover-title');
@@ -871,34 +957,65 @@
             } else {
                 iconEl.innerText = '🦦💧';
                 titleEl.innerText = '등반 종료!';
-                subEl.innerText = '아쉽게 하늘 계단에서 미끄러졌습니다!';
+                subEl.innerText = gameState.totalRemainingSec <= 0 ? '제한 시간이 모두 소진되었습니다!' : '아쉽게 하늘 계단에서 미끄러졌습니다!';
             }
 
             document.getElementById('modal-gameover').classList.remove('hidden');
         }
 
-        function toggleCheatSheet() {
-            initAudio();
-            const modal = document.getElementById('modal-cheat-sheet');
-            modal.classList.toggle('hidden');
-        }
-
-        /* Keyboard Controls: Left / Right Arrows & Escape/P for Pause */
+        /* Keyboard Navigation (Arrow Keys & O/X / Enter) */
         window.addEventListener('keydown', (e) => {
-            if (document.getElementById('screen-game').classList.contains('hidden')) return;
-            if (!document.getElementById('modal-explanation').classList.contains('hidden')) return;
+            const startScreen = document.getElementById('screen-start');
+            const gameScreen = document.getElementById('screen-game');
+            const explanationModal = document.getElementById('modal-explanation');
+            const gameoverModal = document.getElementById('modal-gameover');
 
-            if (e.key === 'p' || e.key === 'P' || e.key === 'Escape') {
-                togglePause();
-                return;
+            // 1. 오답 해설 모달이 열려있을 때 (엔터/스페이스/방향키로 다음 문제 이동)
+            if (explanationModal && !explanationModal.classList.contains('hidden')) {
+                if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+                    e.preventDefault();
+                    closeExplanationModal();
+                    return;
+                }
             }
 
-            if (gameState.isPaused) return;
+            // 2. 게임 오버 모달이 열려있을 때 (엔터로 재도전)
+            if (gameoverModal && !gameoverModal.classList.contains('hidden')) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    startGame();
+                    return;
+                }
+            }
 
-            if (e.key === 'ArrowLeft') {
-                makeChoice('left');
-            } else if (e.key === 'ArrowRight') {
-                makeChoice('right');
+            // 3. 시작 화면일 때 (엔터로 게임 시작)
+            if (startScreen && !startScreen.classList.contains('hidden')) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    startGame();
+                    return;
+                }
+            }
+
+            // 4. 인게임 화면일 때 (방향키 및 O/X 키 작동)
+            if (gameScreen && !gameScreen.classList.contains('hidden')) {
+                if (e.key === 'ArrowLeft' || e.key.toLowerCase() === 'o') {
+                    e.preventDefault();
+                    const btn = document.getElementById('btn-step-left');
+                    if (btn) {
+                        btn.classList.add('scale-95');
+                        setTimeout(() => btn.classList.remove('scale-95'), 100);
+                    }
+                    makeChoice('left');
+                } else if (e.key === 'ArrowRight' || e.key.toLowerCase() === 'x') {
+                    e.preventDefault();
+                    const btn = document.getElementById('btn-step-right');
+                    if (btn) {
+                        btn.classList.add('scale-95');
+                        setTimeout(() => btn.classList.remove('scale-95'), 100);
+                    }
+                    makeChoice('right');
+                }
             }
         });
     </script>
