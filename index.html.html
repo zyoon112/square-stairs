@@ -152,46 +152,46 @@
         <div class="absolute top-2/3 left-[-15%] opacity-60 animate-cloud-drift text-white text-7xl" style="animation-duration: 28s; animation-delay: -12s;">☁️</div>
     </div>
 
-    <header class="w-full max-w-lg sky-card rounded-2xl sm:rounded-3xl p-2 sm:p-2.5 mb-1 flex items-center justify-between z-20 shadow-xl relative">
-        <div class="flex items-center space-x-2">
-            <button id="btn-home" onclick="resetToHome()" class="text-sky-600 hover:text-sky-800 transition p-1.5 sm:p-2 rounded-2xl hover:bg-sky-100/70" title="처음으로">
-                <i class="fa-solid fa-house text-lg sm:text-xl"></i>
+    <header class="w-full max-w-lg sky-card rounded-2xl sm:rounded-3xl p-2 sm:p-2.5 mb-1 flex items-center justify-between z-20 shadow-xl relative gap-1">
+        <div class="flex items-center space-x-1 sm:space-x-2 shrink-0">
+            <button id="btn-home" onclick="resetToHome()" class="text-sky-600 hover:text-sky-800 transition p-1.5 rounded-xl hover:bg-sky-100/70" title="처음으로">
+                <i class="fa-solid fa-house text-base sm:text-lg"></i>
             </button>
             <div>
-                <h1 class="text-base sm:text-lg font-black text-sky-900 flex items-center gap-1.5 font-cute text-xl sm:text-2xl">
+                <h1 class="text-xs sm:text-base font-black text-sky-900 flex items-center gap-1 font-cute text-sm sm:text-xl">
                     <span>🦦 수달의 하늘 계단</span>
                 </h1>
             </div>
         </div>
 
         <!-- HUD Stats -->
-        <div class="flex items-center space-x-2 sm:space-x-3">
+        <div class="flex items-center space-x-1.5 sm:space-x-2 shrink-0">
             <!-- 3 Hearts -->
-            <div class="flex items-center space-x-0.5 sm:space-x-1" id="hearts-container">
-                <i class="fa-solid fa-heart text-pink-500 text-sm sm:text-lg animate-pulse"></i>
-                <i class="fa-solid fa-heart text-pink-500 text-sm sm:text-lg animate-pulse"></i>
-                <i class="fa-solid fa-heart text-pink-500 text-sm sm:text-lg animate-pulse"></i>
+            <div class="flex items-center space-x-0.5" id="hearts-container">
+                <i class="fa-solid fa-heart text-pink-500 text-xs sm:text-base animate-pulse"></i>
+                <i class="fa-solid fa-heart text-pink-500 text-xs sm:text-base animate-pulse"></i>
+                <i class="fa-solid fa-heart text-pink-500 text-xs sm:text-base animate-pulse"></i>
             </div>
 
             <!-- Total Remaining Time Counter -->
-            <div class="text-right bg-sky-100/90 px-2 py-1 rounded-xl border border-sky-200 shadow-inner">
-                <span class="text-[9px] text-sky-700 font-bold block leading-none">남은 시간</span>
+            <div class="text-center bg-sky-100/90 px-1.5 py-0.5 sm:px-2 sm:py-1 rounded-xl border border-sky-200 shadow-inner">
+                <span class="text-[8px] sm:text-[9px] text-sky-700 font-bold block leading-none">시간</span>
                 <span id="total-time-display" class="text-xs sm:text-sm font-black text-rose-600 font-cute">05:00</span>
             </div>
 
             <!-- Floor Counter -->
-            <div class="text-right">
-                <span class="text-[10px] text-sky-600 font-bold block leading-none">현재 / 목표</span>
-                <span id="floor-counter" class="text-lg sm:text-2xl font-black text-amber-500 font-cute">0 / 100F</span>
+            <div class="text-center bg-amber-100 px-2 py-0.5 sm:py-1 rounded-xl border border-amber-300 shadow-sm min-w-[48px]">
+                <span class="text-[8px] sm:text-[9px] text-amber-800 font-black block leading-none">도달 층수</span>
+                <span id="floor-counter" class="text-xs sm:text-base font-black text-amber-600 font-cute leading-tight block">0F</span>
             </div>
 
             <!-- Pause Button -->
-            <button onclick="togglePause()" class="bg-amber-500 hover:bg-amber-600 text-white p-1.5 sm:p-2 rounded-xl text-xs font-bold shadow-md transition" title="일시정지">
+            <button onclick="togglePause()" class="bg-amber-500 hover:bg-amber-600 text-white p-1 sm:p-2 rounded-xl text-xs font-bold shadow-md transition shrink-0" title="일시정지">
                 <i class="fa-solid fa-pause"></i>
             </button>
 
             <!-- Cheat Sheet Button -->
-            <button onclick="toggleCheatSheet()" class="bg-sky-500 hover:bg-sky-600 text-white p-1.5 sm:p-2 rounded-xl text-xs font-bold shadow-md transition" title="도형 도감">
+            <button onclick="toggleCheatSheet()" class="bg-sky-500 hover:bg-sky-600 text-white p-1 sm:p-2 rounded-xl text-xs font-bold shadow-md transition shrink-0" title="도형 도감">
                 <i class="fa-solid fa-book-open"></i>
             </button>
         </div>
@@ -199,7 +199,6 @@
 
     <main class="w-full max-w-lg flex-1 flex flex-col items-center justify-start relative my-0.5 z-10 min-h-0">
 
-        <!-- SCREEN 1: START SCREEN -->
         <div id="screen-start" class="w-full sky-card rounded-3xl p-5 sm:p-8 text-center shadow-2xl flex flex-col items-center space-y-4 sm:space-y-6 border-4 border-white my-auto">
             
             <div class="relative py-2">
@@ -260,7 +259,6 @@
             </button>
         </div>
 
-        <!-- SCREEN 2: IN-GAME SCREEN -->
         <div id="screen-game" class="w-full sky-card rounded-3xl p-3 sm:p-4 text-center shadow-2xl flex flex-col justify-between border-4 border-white hidden space-y-2">
             
             <!-- Question Card -->
@@ -280,7 +278,14 @@
 
             <!-- Stairs Canvas View -->
             <div id="stairs-container" class="relative w-full h-60 sm:h-72 rounded-2xl overflow-hidden border-2 border-white shadow-inner" style="background: linear-gradient(180deg, #0284c7 0%, #38bdf8 55%, #bae6fd 100%);">
-                <div class="absolute top-2 left-4 text-white text-xl opacity-60 pointer-events-none">☁️</div>
+                <!-- Overlay Floor Badge for Constant Visibility -->
+                <div class="absolute top-2.5 left-2.5 z-20 bg-slate-900/70 backdrop-blur-md px-3 py-1 rounded-full border border-white/40 text-white flex items-center gap-1.5 shadow-lg pointer-events-none">
+                    <span class="text-amber-300 text-xs sm:text-sm">🚩</span>
+                    <span class="text-[10px] sm:text-xs text-sky-200 font-bold">현재 층:</span>
+                    <span id="canvas-floor-badge" class="text-xs sm:text-sm font-black text-amber-300 font-cute">0 / 100F</span>
+                </div>
+
+                <div class="absolute top-2 right-4 text-white text-xl opacity-60 pointer-events-none">☁️</div>
                 <div class="absolute top-6 right-8 text-white text-2xl opacity-50 pointer-events-none">☁️</div>
                 <div class="absolute top-1/2 left-1/3 text-white text-3xl opacity-30 pointer-events-none">☁️</div>
 
@@ -332,7 +337,6 @@
             </div>
         </div>
 
-        <!-- MODAL 1: EXPLANATION MODAL -->
         <div id="modal-explanation" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
             <div class="sky-card w-full max-w-md rounded-3xl p-4 sm:p-5 border-4 border-pink-300 shadow-2xl flex flex-col space-y-3 animate-shake">
                 <div class="flex items-center justify-between border-b border-sky-100 pb-2">
@@ -353,7 +357,6 @@
             </div>
         </div>
 
-        <!-- MODAL 2: CHEAT SHEET -->
         <div id="modal-cheat-sheet" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
             <div class="sky-card w-full max-w-lg max-h-[85vh] rounded-3xl p-4 sm:p-5 border-4 border-sky-300 shadow-2xl flex flex-col space-y-3 overflow-y-auto">
                 <div class="flex items-center justify-between border-b border-sky-200 pb-2">
@@ -435,7 +438,6 @@
             </div>
         </div>
 
-        <!-- MODAL 3: GAME OVER / VICTORY MODAL -->
         <div id="modal-gameover" class="fixed inset-0 bg-slate-900/70 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
             <div class="sky-card w-full max-w-sm rounded-3xl p-6 text-center space-y-4 border-4 border-white shadow-2xl">
                 <div id="gameover-icon" class="text-6xl animate-bounce">🦦</div>
@@ -465,7 +467,6 @@
             </div>
         </div>
 
-        <!-- MODAL 4: PAUSE MODAL -->
         <div id="modal-pause" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
             <div class="sky-card w-full max-w-sm rounded-3xl p-6 text-center space-y-4 border-4 border-white shadow-2xl">
                 <div class="text-5xl animate-bounce">⏸️</div>
@@ -484,7 +485,6 @@
 
     </main>
 
-    <!-- Footer Copyright -->
     <footer class="w-full text-center py-2 text-xs font-semibold text-sky-900/80 drop-shadow-sm z-10">
         © zyoont. All rights reserved.
     </footer>
@@ -545,7 +545,6 @@
         let synth;
         let polySynth;
 
-        /* Audio initialization using Tone.js */
         function initAudio() {
             if (gameState.isAudioInitialized) return;
             try {
@@ -560,7 +559,6 @@
             }
         }
 
-        /* Sound effect player */
         function playSound(type) {
             if (!gameState.isAudioInitialized || !synth) return;
             try {
@@ -584,7 +582,6 @@
             }
         }
 
-        /* HUD update helper function */
         function updateHUD() {
             const heartsContainer = document.getElementById('hearts-container');
             if (heartsContainer) {
@@ -592,9 +589,9 @@
                 for (let i = 0; i < 3; i++) {
                     const heart = document.createElement('i');
                     if (i < gameState.lives) {
-                        heart.className = 'fa-solid fa-heart text-pink-500 text-sm sm:text-lg animate-pulse';
+                        heart.className = 'fa-solid fa-heart text-pink-500 text-xs sm:text-base animate-pulse';
                     } else {
-                        heart.className = 'fa-solid fa-heart text-slate-300 text-sm sm:text-lg';
+                        heart.className = 'fa-solid fa-heart text-slate-300 text-xs sm:text-base';
                     }
                     heartsContainer.appendChild(heart);
                 }
@@ -602,7 +599,12 @@
 
             const floorCounter = document.getElementById('floor-counter');
             if (floorCounter) {
-                floorCounter.innerText = `${gameState.floor} / ${TARGET_FLOOR}F`;
+                floorCounter.innerText = `${gameState.floor}F`;
+            }
+
+            const canvasFloorBadge = document.getElementById('canvas-floor-badge');
+            if (canvasFloorBadge) {
+                canvasFloorBadge.innerText = `${gameState.floor} / ${TARGET_FLOOR}F`;
             }
 
             const comboBadge = document.getElementById('combo-badge');
@@ -812,7 +814,6 @@
 
                 wrapper.appendChild(tile);
 
-                /* Align Otter feet exactly at the vertical midpoint of the current step (+16px) */
                 if (i === 0) {
                     const avatar = document.getElementById('player-avatar');
                     if (avatar) {
@@ -947,30 +948,36 @@
             const titleEl = document.getElementById('gameover-title');
             const subEl = document.getElementById('gameover-sub');
 
-            document.getElementById('final-floor').innerText = `${gameState.floor} / ${TARGET_FLOOR}F`;
-            document.getElementById('final-combo').innerText = gameState.maxCombo;
-
-            if (isVictory) {
-                iconEl.innerText = '👑🦦';
-                titleEl.innerText = '100층 정상 정복!';
-                subEl.innerText = '축하합니다! 사각형 개념의 마스터가 되셨습니다! 🎉';
-            } else {
-                iconEl.innerText = '🦦💧';
-                titleEl.innerText = '등반 종료!';
-                subEl.innerText = gameState.totalRemainingSec <= 0 ? '제한 시간이 모두 소진되었습니다!' : '아쉽게 하늘 계단에서 미끄러졌습니다!';
+            const finalFloorEl = document.getElementById('final-floor');
+            if (finalFloorEl) {
+                finalFloorEl.innerText = `${gameState.floor}층 (${gameState.floor} / ${TARGET_FLOOR}F)`;
             }
 
-            document.getElementById('modal-gameover').classList.remove('hidden');
+            const finalComboEl = document.getElementById('final-combo');
+            if (finalComboEl) {
+                finalComboEl.innerText = `${gameState.maxCombo} 콤보`;
+            }
+
+            if (isVictory) {
+                if (iconEl) iconEl.innerText = '👑🦦';
+                if (titleEl) titleEl.innerText = '100층 정상 정복!';
+                if (subEl) subEl.innerText = '축하합니다! 사각형 개념의 마스터가 되셨습니다! 🎉';
+            } else {
+                if (iconEl) iconEl.innerText = '🦦💧';
+                if (titleEl) titleEl.innerText = '등반 종료!';
+                if (subEl) subEl.innerText = gameState.totalRemainingSec <= 0 ? '제한 시간이 모두 소진되었습니다!' : '아쉽게 하늘 계단에서 미끄러졌습니다!';
+            }
+
+            const gameoverModal = document.getElementById('modal-gameover');
+            if (gameoverModal) gameoverModal.classList.remove('hidden');
         }
 
-        /* Keyboard Navigation (Arrow Keys & O/X / Enter) */
         window.addEventListener('keydown', (e) => {
             const startScreen = document.getElementById('screen-start');
             const gameScreen = document.getElementById('screen-game');
             const explanationModal = document.getElementById('modal-explanation');
             const gameoverModal = document.getElementById('modal-gameover');
 
-            // 1. 오답 해설 모달이 열려있을 때 (엔터/스페이스/방향키로 다음 문제 이동)
             if (explanationModal && !explanationModal.classList.contains('hidden')) {
                 if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
                     e.preventDefault();
@@ -979,7 +986,6 @@
                 }
             }
 
-            // 2. 게임 오버 모달이 열려있을 때 (엔터로 재도전)
             if (gameoverModal && !gameoverModal.classList.contains('hidden')) {
                 if (e.key === 'Enter') {
                     e.preventDefault();
@@ -988,7 +994,6 @@
                 }
             }
 
-            // 3. 시작 화면일 때 (엔터로 게임 시작)
             if (startScreen && !startScreen.classList.contains('hidden')) {
                 if (e.key === 'Enter') {
                     e.preventDefault();
@@ -997,7 +1002,6 @@
                 }
             }
 
-            // 4. 인게임 화면일 때 (방향키 및 O/X 키 작동)
             if (gameScreen && !gameScreen.classList.contains('hidden')) {
                 if (e.key === 'ArrowLeft' || e.key.toLowerCase() === 'o') {
                     e.preventDefault();
